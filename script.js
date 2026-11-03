@@ -26,12 +26,16 @@ function showPhoto(index){
  if(!currentPhotos.length)return;
  photoIndex=(index+currentPhotos.length)%currentPhotos.length;
  const item=currentPhotos[photoIndex],img=photoDialog.querySelector('img');
- img.src=item.dataset.photo;img.alt=item.querySelector('img').alt;
+ const label=item.closest('figure')?.querySelector(`figcaption [lang="${document.documentElement.lang}"]`)?.textContent;
+ img.src=item.dataset.photo;img.alt=label||item.querySelector('img').alt;
  const caption=photoDialog.querySelector('.photo-caption');
  if(caption)caption.textContent=img.alt;
  document.getElementById('photo-position').textContent=`${photoIndex+1} / ${currentPhotos.length}`;
- photoDialog.querySelector('.photo-prev').hidden=currentPhotos.length<2;
- photoDialog.querySelector('.photo-next').hidden=currentPhotos.length<2;
+ photoDialog.querySelector('.photo-controls').hidden=currentPhotos.length<2;
+ /* Keep the card on the enlarged slide, so closing returns focus to a visible button. */
+ const gallery=item.closest('.research-gallery');
+ if(gallery)selectSlide(gallery,photoIndex);
+ photoOrigin=item;
 }
 if(photoDialog){
  photos.forEach(button=>button.addEventListener('click',()=>{
@@ -48,23 +52,28 @@ if(photoDialog){
 }
 
 /* Each research card keeps one image slot; enlargement uses the same slides. */
-document.querySelectorAll('.research-gallery').forEach(gallery=>{
+function selectSlide(gallery,next){
  const slides=[...gallery.querySelectorAll('.research-figure')];
- let index=0;
- function select(next){
-  index=(next+slides.length)%slides.length;
-  slides.forEach((slide,i)=>{slide.hidden=i!==index;});
-  const count=gallery.querySelector('.research-position');
-  if(count)count.textContent=`${index+1} / ${slides.length}`;
- }
- gallery.querySelector('.research-prev')?.addEventListener('click',()=>select(index-1));
- gallery.querySelector('.research-next')?.addEventListener('click',()=>select(index+1));
+ const index=(next+slides.length)%slides.length;
+ slides.forEach((slide,i)=>{slide.hidden=i!==index;});
+ const count=gallery.querySelector('.research-position');
+ if(count)count.textContent=`${index+1} / ${slides.length}`;
+ return slides[index];
+}
+document.querySelectorAll('.research-gallery').forEach(gallery=>{
+ const current=()=>[...gallery.querySelectorAll('.research-figure')].findIndex(slide=>!slide.hidden);
+ /* Hidden slides never trigger lazy loading, which left a blank frame on the first click. */
+ gallery.querySelectorAll('img').forEach(img=>{img.loading='eager';});
+ gallery.querySelector('.research-prev')?.addEventListener('click',()=>selectSlide(gallery,current()-1));
+ gallery.querySelector('.research-next')?.addEventListener('click',()=>selectSlide(gallery,current()+1));
  gallery.addEventListener('keydown',event=>{
   if(event.key==='ArrowLeft'||event.key==='ArrowRight'){
-   event.preventDefault();select(index+(event.key==='ArrowRight'?1:-1));
-   slides[index].querySelector('button')?.focus({preventScroll:true});
+   event.preventDefault();
+   const fromSlide=event.target.closest('.research-figure');
+   const slide=selectSlide(gallery,current()+(event.key==='ArrowRight'?1:-1));
+   if(fromSlide)slide.querySelector('button')?.focus({preventScroll:true});
   }
  });
- select(0);
+ selectSlide(gallery,0);
 });
 
