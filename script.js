@@ -11,7 +11,6 @@ setLanguage(new URL(location.href).searchParams.get('lang')||saved||'en');
 document.querySelectorAll('[data-language]').forEach(b=>b.addEventListener('click',()=>setLanguage(b.dataset.language)));
 function filterPapers(category){let count=0;document.querySelectorAll('.publication').forEach(p=>{const show=category==='all'||p.dataset.category===category;p.hidden=!show;if(show)count++;});document.querySelectorAll('[data-filter]').forEach(b=>{const selected=b.dataset.filter===category;b.classList.toggle('active',selected);b.setAttribute('aria-pressed',String(selected));});const output=document.getElementById('pub-count');if(output)output.textContent=count;}
 document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>filterPapers(b.dataset.filter)));
-document.querySelectorAll('[data-shortcut]').forEach(b=>b.addEventListener('click',()=>{filterPapers(b.dataset.shortcut);document.getElementById('publications')?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});}));
 const dialog=document.getElementById('image-dialog');let imageTrigger;
 document.querySelectorAll('[data-open-image]').forEach(b=>b.addEventListener('click',()=>{if(!dialog)return;imageTrigger=b;dialog.showModal();document.body.classList.add('modal-open');}));
 if(dialog){dialog.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});dialog.addEventListener('close',()=>{document.body.classList.remove('modal-open');imageTrigger?.focus();});}
@@ -77,3 +76,24 @@ document.querySelectorAll('.research-gallery').forEach(gallery=>{
  selectSlide(gallery,0);
 });
 
+
+/* A small green blot trails the mouse behind the text; touch screens never see it. */
+if(matchMedia('(hover: hover) and (pointer: fine)').matches){
+ const blot=document.createElement('div');blot.className='cursor-blot';blot.setAttribute('aria-hidden','true');document.body.append(blot);
+ const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+ let x=0,y=0,targetX=0,targetY=0,scale=1,targetScale=1,frame=0;
+ function moveBlot(){
+  const ease=reduced.matches?1:.16,dx=targetX-x,dy=targetY-y;
+  x+=dx*ease;y+=dy*ease;scale+=(targetScale-scale)*(reduced.matches?1:.14);
+  const stretch=reduced.matches?0:Math.min(Math.hypot(dx,dy)/160,.4);
+  blot.style.transform=`translate(${x}px,${y}px) rotate(${Math.atan2(dy,dx)}rad) scale(${scale*(1+stretch)},${scale*(1-stretch*.55)})`;
+  frame=Math.abs(dx)+Math.abs(dy)+Math.abs(targetScale-scale)>.05?requestAnimationFrame(moveBlot):0;
+ }
+ addEventListener('pointermove',e=>{
+  if(e.pointerType!=='mouse')return;
+  if(!blot.classList.contains('visible')){x=e.clientX;y=e.clientY;blot.classList.add('visible');}
+  targetX=e.clientX;targetY=e.clientY;targetScale=e.target.closest?.('a,button,summary')?1.5:1;
+  if(!frame)frame=requestAnimationFrame(moveBlot);
+ },{passive:true});
+ document.documentElement.addEventListener('mouseleave',()=>blot.classList.remove('visible'));
+}
