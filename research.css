@@ -9,10 +9,13 @@
 .gallery-disclosure{margin:0 0 40px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.gallery-disclosure>summary{padding:18px 0;display:flex;justify-content:space-between;cursor:pointer;font-size:13px;list-style:none}.gallery-disclosure>summary::-webkit-details-marker{display:none}.gallery-disclosure[open] .toggle-sign{transform:rotate(45deg)}.gallery-disclosure .film-gallery{padding:10px 0 24px}.countries img.flag{display:block;width:36px;height:24px;object-fit:contain}.next-flag{display:inline-block;vertical-align:middle;margin-right:7px;object-fit:contain}
 
 .research-grid{align-items:start}
-.photo-interest .gallery-disclosure{margin:20px 0 0;border-bottom:0}
+.photo-interest .gallery-disclosure{min-width:0;margin:0;border-bottom:0}
+#photography{grid-template-rows:auto 1fr}
+#photography .gallery-disclosure{grid-column:2;grid-row:2}
 .photo-interest .gallery-disclosure>summary{padding-bottom:0}
 .photo-interest .gallery-disclosure .film-gallery{padding:16px 0 0}
-#photography .interest-portrait{align-self:start}
+#photography .interest-portrait{grid-row:1/3;align-self:start}
+@media(max-width:720px){#photography{grid-template-rows:none}#photography .interest-portrait{grid-row:2}#photography .gallery-disclosure{grid-row:3}}
 
 
 /* Keep the disclosure control fixed in the layout in both states. */
