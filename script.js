@@ -46,3 +46,25 @@ if(photoDialog){
  photoDialog.addEventListener('close',()=>{document.body.classList.remove('modal-open');photoOrigin?.focus({preventScroll:true});});
  photoDialog.addEventListener('click',e=>{if(e.target===photoDialog){const r=photoDialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)photoDialog.close();}});
 }
+
+/* Each research card keeps one image slot; enlargement uses the same slides. */
+document.querySelectorAll('.research-gallery').forEach(gallery=>{
+ const slides=[...gallery.querySelectorAll('.research-figure')];
+ let index=0;
+ function select(next){
+  index=(next+slides.length)%slides.length;
+  slides.forEach((slide,i)=>{slide.hidden=i!==index;});
+  const count=gallery.querySelector('.research-position');
+  if(count)count.textContent=`${index+1} / ${slides.length}`;
+ }
+ gallery.querySelector('.research-prev')?.addEventListener('click',()=>select(index-1));
+ gallery.querySelector('.research-next')?.addEventListener('click',()=>select(index+1));
+ gallery.addEventListener('keydown',event=>{
+  if(event.key==='ArrowLeft'||event.key==='ArrowRight'){
+   event.preventDefault();select(index+(event.key==='ArrowRight'?1:-1));
+   slides[index].querySelector('button')?.focus({preventScroll:true});
+  }
+ });
+ select(0);
+});
+
