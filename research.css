@@ -9,10 +9,16 @@
 .gallery-disclosure{margin:0 0 40px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.gallery-disclosure>summary{padding:18px 0;display:flex;justify-content:space-between;cursor:pointer;font-size:13px;list-style:none}.gallery-disclosure>summary::-webkit-details-marker{display:none}.gallery-disclosure[open] .toggle-sign{transform:rotate(45deg)}.gallery-disclosure .film-gallery{padding:10px 0 24px}.countries img.flag{display:block;width:36px;height:24px;object-fit:contain}.next-flag{display:inline-block;vertical-align:middle;margin-right:7px;object-fit:contain}
 
 .research-grid{align-items:start}
+.photo-interest .gallery-disclosure{grid-column:2/4;min-width:0;margin:0;border-bottom:0}
+.photo-interest .gallery-disclosure>summary{padding-bottom:0}
+@media(max-width:720px){.photo-interest .gallery-disclosure{grid-column:2}}
 
 
 /* Keep the disclosure control fixed in the layout in both states. */
-.abstract p{animation:none}
+.abstract p{animation:none;clear:both}
+/* The paper link and the abstract toggle share a line; the abstract opens below both. */
+.publication-body .paper-link{float:left;margin-right:20px}
+.abstract,.abstract[open]{margin:0 0 12px}
 .research-figure{margin:0 0 20px}.research-figure a{display:block;background:#f0f0e9;border:1px solid var(--line);border-radius:3px;overflow:hidden}.research-figure img{display:block;width:100%;height:200px;object-fit:contain}.research-figure figcaption{margin-top:8px;font-size:10px;line-height:1.6;color:var(--muted)}.research-figure a:focus-visible{outline:2px solid var(--red);outline-offset:4px}@media(max-width:720px){.research-figure img{height:auto;max-height:280px;object-fit:contain}}
 
 
